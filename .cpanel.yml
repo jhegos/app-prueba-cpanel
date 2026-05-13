@@ -2,4 +2,6 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/uclubperu/public_html/prueba-git/
-    - /bin/rsync -av --exclude='.git' --exclude='.github' --exclude='.cpanel.yml' ./ $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/cp index.php $DEPLOYPATH/index.php
+    - /bin/cp test.txt $DEPLOYPATH/test.txt
