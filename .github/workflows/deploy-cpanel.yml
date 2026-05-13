@@ -1,0 +1,35 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+      CPANEL_USER: ${{ secrets.CPANEL_USER }}
+      CPANEL_TOKEN: ${{ secrets.CPANEL_TOKEN }}
+      REPOSITORY_ROOT: /home/uclubperu/repositories/app-prueba-cpanel
+
+    steps:
+      - name: Update repository from GitHub
+        run: |
+          curl -sS --fail-with-body \
+            -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
+            --get "https://${CPANEL_HOST}:2083/execute/VersionControl/update" \
+            --data-urlencode "repository_root=${REPOSITORY_ROOT}" \
+            --data-urlencode "branch=main"
+
+      - name: Wait for cPanel pull
+        run: sleep 15
+
+      - name: Deploy HEAD Commit
+        run: |
+          curl -sS --fail-with-body \
+            -H "Authorization: cpanel ${CPANEL_USER}:${CPANEL_TOKEN}" \
+            --get "https://${CPANEL_HOST}:2083/execute/VersionControlDeployment/create" \
+            --data-urlencode "repository_root=${REPOSITORY_ROOT}"
